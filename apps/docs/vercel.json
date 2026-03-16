@@ -2,6 +2,7 @@
   "redirects": [
     { "source": "/:adapter/installation", "destination": "/:adapter/getting-started", "permanent": true },
     { "source": "/:adapter/ui-libs-integrations", "destination": "/:adapter/configuration", "permanent": true },
+    { "source": "/:adapter/custom-integrations", "destination": "/:adapter/building-an-adapter", "permanent": true },
 
     { "source": "/installation", "destination": "/material/getting-started", "permanent": true },
     { "source": "/getting-started", "destination": "/material/getting-started", "permanent": true },
@@ -15,8 +16,15 @@
     { "source": "/prebuilt/:path*", "destination": "/material/prebuilt/:path*", "permanent": true },
     { "source": "/schema-validation/:path*", "destination": "/material/schema-validation/:path*", "permanent": true },
     { "source": "/advanced/:path*", "destination": "/material/advanced/:path*", "permanent": true },
-    { "source": "/custom-integrations", "destination": "/material/custom-integrations", "permanent": true },
+    { "source": "/custom-integrations", "destination": "/custom/building-an-adapter", "permanent": true },
+    { "source": "/building-an-adapter", "destination": "/custom/building-an-adapter", "permanent": true },
     { "source": "/ai-integration", "destination": "/material/ai-integration", "permanent": true },
+
+    { "source": "/material", "destination": "/material/getting-started", "permanent": true },
+    { "source": "/bootstrap", "destination": "/bootstrap/getting-started", "permanent": true },
+    { "source": "/primeng", "destination": "/primeng/getting-started", "permanent": true },
+    { "source": "/ionic", "destination": "/ionic/getting-started", "permanent": true },
+    { "source": "/custom", "destination": "/custom/getting-started", "permanent": true },
 
     { "source": "/ui-libs-integrations/material", "destination": "/material/configuration", "permanent": true },
     { "source": "/ui-libs-integrations/bootstrap", "destination": "/bootstrap/configuration", "permanent": true },

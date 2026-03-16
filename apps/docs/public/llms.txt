@@ -21,72 +21,100 @@ Dynamic Forms provides a powerful way to create dynamic forms in Angular applica
 
 ## Documentation Structure
 
-### Getting Started
-- /installation: How to install and set up ng-forge dynamic forms in your project
+All documentation paths are adapter-prefixed. Replace `{adapter}` with one of: `material`, `bootstrap`, `primeng`, `ionic`. Use `custom` for the adapter authoring guide.
 
-### UI Library Integrations
-- /ui-libs-integrations/material: Angular Material integration
-- /ui-libs-integrations/primeng: PrimeNG integration
-- /ui-libs-integrations/ionic: Ionic integration
-- /ui-libs-integrations/bootstrap: Bootstrap integration
+### Getting Started
+- /{adapter}/getting-started: How to install and set up ng-forge dynamic forms in your project
+
+### Configuration
+- /{adapter}/configuration: Configure ng-forge with your preferred UI library (Material, PrimeNG, Ionic, Bootstrap)
 
 ### Field Types
-- /field-types: Available field types (input, select, checkbox, radio, toggle, textarea, datepicker, slider, multi-checkbox, button, submit, next, previous)
+- /{adapter}/schema-fields/field-types/text-inputs: Text input field types (input, textarea)
+- /{adapter}/schema-fields/field-types/selection: Selection field types (select, radio, checkbox, multi-checkbox, toggle)
+- /{adapter}/schema-fields/field-types/advanced-controls: Advanced control field types (datepicker, slider)
+- /{adapter}/schema-fields/field-types/buttons: Button field types (submit, button, next, previous)
+- /{adapter}/schema-fields/field-types/utility: Utility field types (hidden, text, group, row, array, page)
 
 ### Validation
-- /validation/basics: Validation configuration basics
-- /validation/advanced: Conditional validators
-- /validation/custom-validators: Custom and expression validators
-- /validation/reference: Complete validation reference
+- /{adapter}/validation/basics: Validation configuration basics
+- /{adapter}/validation/advanced: Conditional validators
+- /{adapter}/validation/custom-validators: Custom and expression validators
+- /{adapter}/validation/reference: Complete validation reference
 
 ### Dynamic Behavior
-- /dynamic-behavior/overview: Conditional logic - show/hide fields based on conditions
-- /dynamic-behavior/derivation: Value derivation - computed field values
-- /dynamic-behavior/derivation/property: Property derivation - dynamic field properties
-- /dynamic-behavior/i18n: Internationalization support
-- /dynamic-behavior/submission: Form submission handling
+- /{adapter}/dynamic-behavior/overview: Conditional logic — show/hide fields based on conditions
+- /{adapter}/dynamic-behavior/derivation: Value derivation — computed field values
+- /{adapter}/dynamic-behavior/derivation/property: Property derivation — dynamic field properties
+- /{adapter}/dynamic-behavior/i18n: Internationalization support
+- /{adapter}/dynamic-behavior/submission: Form submission handling
 
 ### Schema Validation
-- /schema-validation/overview: Form-level validation overview
-- /schema-validation/angular-schema: Angular native schema validation
-- /schema-validation/zod: Standard Schema (Zod, Valibot, ArkType) validation
+- /{adapter}/schema-validation/overview: Form-level schema validation overview
+- /{adapter}/schema-validation/angular-schema: Angular native schema validation
+- /{adapter}/schema-validation/zod: Standard Schema (Zod, Valibot, ArkType) validation
 
 ### Layout Components
-- /prebuilt/form-pages: Page container components
-- /prebuilt/form-groups: Field grouping components
-- /prebuilt/form-rows: Row layout components
-- /prebuilt/form-arrays/simplified: Simplified array API (recommended)
-- /prebuilt/form-arrays/complete: Complete array API (advanced)
-- /prebuilt/text-components: Text and label components
-- /prebuilt/hidden-fields: Hidden field components
+- /{adapter}/prebuilt/form-pages: Page container components
+- /{adapter}/prebuilt/form-groups: Field grouping components
+- /{adapter}/prebuilt/form-rows: Row layout components
+- /{adapter}/prebuilt/form-arrays/simplified: Simplified array API (recommended)
+- /{adapter}/prebuilt/form-arrays/complete: Complete array API (advanced)
+- /{adapter}/prebuilt/text-components: Text and label components
+- /{adapter}/prebuilt/hidden-fields: Hidden field components
 
 ### Examples
-- /examples: Browse all examples
-- /examples/login-form: Simple login form example
-- /examples/contact-form: Contact form with validation
-- /examples/user-registration: Multi-field registration form
-- /examples/paginated-form: Multi-page wizard form
-- /examples/value-derivation: Computed field values example
-- /examples/contact-dynamic-fields: Dynamic contact fields
-- /examples/business-account-form: Business account form
-- /examples/shipping-billing-address: Shipping same-as-billing example
-- /examples/age-conditional-form: Age-based conditional form
-- /examples/enterprise-features: Complex multi-condition form
-- /examples/simplified-array-form: Simplified array API example
-- /examples/array-form: Complete array API example
+- /{adapter}/examples: Browse all examples
+- /{adapter}/examples/login-form: Simple login form example
+- /{adapter}/examples/contact-form: Contact form with validation
+- /{adapter}/examples/user-registration: Multi-field registration form
+- /{adapter}/examples/paginated-form: Multi-page wizard form
+- /{adapter}/examples/value-derivation: Computed field values example
+- /{adapter}/examples/contact-dynamic-fields: Dynamic contact fields
+- /{adapter}/examples/business-account-form: Business account form
+- /{adapter}/examples/shipping-billing-address: Shipping same-as-billing example
+- /{adapter}/examples/age-conditional-form: Age-based conditional form
+- /{adapter}/examples/enterprise-features: Complex multi-condition form
+- /{adapter}/examples/simplified-array-form: Simplified array API example
+- /{adapter}/examples/array-form: Complete array API example
 
 ### Advanced Topics
-- /advanced/basics: TypeScript type safety features
-- /advanced/events: Form and field event handling
-- /advanced/expression-parser: Expression syntax for validators and conditions
-- /advanced/custom-integrations: Creating custom UI library integrations
-- /advanced/value-exclusion: Controlling which fields are included in submitted form values
+- /{adapter}/advanced/type-safety: TypeScript type safety features
+- /{adapter}/advanced/events: Form and field event handling
+- /{adapter}/advanced/expression-parser: Expression syntax for validators and conditions
+- /{adapter}/advanced/value-exclusion: Controlling which fields are included in submitted form values
+- /{adapter}/advanced/custom-fields: Adding custom field types to an existing adapter
+
+### Building an Adapter
+- /custom/building-an-adapter: Creating a custom UI integration for ng-forge dynamic forms
 
 ### AI Integration
-- /ai-integration: MCP server for AI-assisted form schema generation
+- /{adapter}/ai-integration: MCP server for AI-assisted form schema generation
 
 ### API Reference
 - /api: Complete API documentation for all packages
+
+## URL Redirect Map (Legacy → Current)
+
+The following old paths redirect permanently to their current equivalents:
+
+- /installation → /material/getting-started
+- /getting-started → /material/getting-started
+- /ui-libs-integrations → /material/configuration
+- /configuration → /material/configuration
+- /examples → /material/examples
+- /schema-fields/* → /material/schema-fields/*
+- /validation/* → /material/validation/*
+- /dynamic-behavior/* → /material/dynamic-behavior/*
+- /prebuilt/* → /material/prebuilt/*
+- /schema-validation/* → /material/schema-validation/*
+- /advanced/* → /material/advanced/*
+- /custom-integrations → /custom/building-an-adapter
+- /building-an-adapter → /custom/building-an-adapter
+- /ai-integration → /material/ai-integration
+- /{adapter}/installation → /{adapter}/getting-started
+- /{adapter}/ui-libs-integrations → /{adapter}/configuration
+- /{adapter}/custom-integrations → /{adapter}/building-an-adapter
 
 ## Installation
 

@@ -153,6 +153,16 @@
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
+  <url>
+    <loc>https://ng-forge.com/dynamic-forms/material/dynamic-behavior/i18n</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://ng-forge.com/dynamic-forms/material/dynamic-behavior/submission</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
 
   <!-- Layout Components -->
   <url>
@@ -180,15 +190,35 @@
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
+  <url>
+    <loc>https://ng-forge.com/dynamic-forms/material/prebuilt/text-components</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://ng-forge.com/dynamic-forms/material/prebuilt/hidden-fields</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
 
   <!-- Schema Validation -->
+  <url>
+    <loc>https://ng-forge.com/dynamic-forms/material/schema-validation/overview</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://ng-forge.com/dynamic-forms/material/schema-validation/angular-schema</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
   <url>
     <loc>https://ng-forge.com/dynamic-forms/material/schema-validation/zod</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
-  <!-- Recipes -->
+  <!-- Advanced Topics -->
   <url>
     <loc>https://ng-forge.com/dynamic-forms/material/advanced/type-safety</loc>
     <changefreq>monthly</changefreq>
@@ -215,9 +245,9 @@
     <priority>0.6</priority>
   </url>
 
-  <!-- Custom Integrations (standalone root page) -->
+  <!-- Building an Adapter (was: Custom Integrations) -->
   <url>
-    <loc>https://ng-forge.com/dynamic-forms/material/custom-integrations</loc>
+    <loc>https://ng-forge.com/dynamic-forms/custom/building-an-adapter</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
