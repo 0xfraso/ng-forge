@@ -14,9 +14,9 @@ export type { DynamicFormFieldRegistry, AvailableFieldTypes } from '../models/re
 export type { RegisteredFieldTypes } from '../models/types';
 
 /**
- * Field type definitions with optional config providers
+ * Field type definition with optional config metadata.
  */
-type FieldTypeDefinitionsWithConfig = FieldTypeDefinition[] & {
+type FieldTypeDefinitionWithConfig = FieldTypeDefinition & {
   __configProviders?: Provider[];
 };
 
@@ -116,10 +116,10 @@ export function provideDynamicForm<const T extends FieldTypeOrFeature[]>(
 
   const fields = [...BUILT_IN_FIELDS, ...fieldTypes];
 
-  // Extract config providers from field type arrays
+  // Extract config providers from field definitions
   const configProviders: Provider[] = [];
-  fieldTypes.forEach((fieldTypeArray) => {
-    const fieldTypeWithConfig = fieldTypeArray as unknown as FieldTypeDefinitionsWithConfig;
+  fieldTypes.forEach((fieldType) => {
+    const fieldTypeWithConfig = fieldType as FieldTypeDefinitionWithConfig;
     if (fieldTypeWithConfig.__configProviders) {
       configProviders.push(...fieldTypeWithConfig.__configProviders);
     }

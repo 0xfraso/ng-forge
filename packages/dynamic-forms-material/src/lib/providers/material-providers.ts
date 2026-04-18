@@ -3,28 +3,18 @@ import type { Provider } from '@angular/core';
 import { MATERIAL_FIELD_TYPES } from '../config/material-field-config';
 import { MaterialConfig } from '../models/material-config';
 import { MATERIAL_CONFIG } from '../models/material-config.token';
-import {
-  MatButtonField,
-  MatCheckboxField,
-  MatDatepickerField,
-  MatInputField,
-  MatMultiCheckboxField,
-  MatNextButtonField,
-  MatPreviousButtonField,
-  MatRadioField,
-  MatSelectField,
-  MatSliderField,
-  MatSubmitButtonField,
-  MatTextareaField,
-  MatToggleField,
-} from '../fields';
 
 /**
- * Field type definitions with optional config providers
+ * Field type definition with optional config providers.
  */
-export type FieldTypeDefinitionsWithConfig = FieldTypeDefinition[] & {
+type FieldTypeDefinitionWithConfig = FieldTypeDefinition & {
   __configProviders?: Provider[];
 };
+
+/**
+ * Field type definitions whose individual items may carry config providers.
+ */
+export type FieldTypeDefinitionsWithConfig = FieldTypeDefinitionWithConfig[];
 
 /**
  * Configure dynamic forms with Material Design field types.
@@ -64,38 +54,28 @@ export type FieldTypeDefinitionsWithConfig = FieldTypeDefinition[] & {
  * @returns Array of field type definitions for Material Design components
  */
 export function withMaterialFields(config?: MaterialConfig): FieldTypeDefinitionsWithConfig {
-  const fields = MATERIAL_FIELD_TYPES as FieldTypeDefinitionsWithConfig;
+  if (!config) {
+    return MATERIAL_FIELD_TYPES;
+  }
 
-  if (config) {
-    fields.__configProviders = [
-      {
-        provide: MATERIAL_CONFIG,
-        useValue: config,
-      },
-    ];
+  const fields: FieldTypeDefinitionsWithConfig = [...MATERIAL_FIELD_TYPES];
+  const firstField = fields[0];
+
+  if (firstField) {
+    const clonedField = { ...firstField };
+
+    Object.defineProperty(clonedField, '__configProviders', {
+      value: [
+        {
+          provide: MATERIAL_CONFIG,
+          useValue: config,
+        },
+      ],
+      enumerable: false,
+    });
+
+    fields[0] = clonedField;
   }
 
   return fields;
-}
-
-/**
- * Module augmentation to extend the global DynamicFormFieldRegistry
- * with Material Design field types
- */
-declare module '@ng-forge/dynamic-forms' {
-  interface DynamicFormFieldRegistry {
-    input: MatInputField;
-    select: MatSelectField<any>;
-    checkbox: MatCheckboxField;
-    button: MatButtonField<any>;
-    submit: MatSubmitButtonField;
-    next: MatNextButtonField;
-    previous: MatPreviousButtonField;
-    textarea: MatTextareaField;
-    radio: MatRadioField<any>;
-    'multi-checkbox': MatMultiCheckboxField<any>;
-    datepicker: MatDatepickerField;
-    slider: MatSliderField;
-    toggle: MatToggleField;
-  }
 }

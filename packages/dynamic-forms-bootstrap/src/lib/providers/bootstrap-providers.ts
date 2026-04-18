@@ -5,11 +5,16 @@ import { BootstrapConfig } from '../models/bootstrap-config';
 import { BOOTSTRAP_CONFIG } from '../models/bootstrap-config.token';
 
 /**
- * Field type definitions with optional config providers
+ * Field type definition with optional config providers.
  */
-export type FieldTypeDefinitionsWithConfig = FieldTypeDefinition[] & {
+type FieldTypeDefinitionWithConfig = FieldTypeDefinition & {
   __configProviders?: Provider[];
 };
+
+/**
+ * Field type definitions whose individual items may carry config providers.
+ */
+export type FieldTypeDefinitionsWithConfig = FieldTypeDefinitionWithConfig[];
 
 /**
  * Provides Bootstrap field types for the dynamic form system.
@@ -49,15 +54,27 @@ export type FieldTypeDefinitionsWithConfig = FieldTypeDefinition[] & {
  * @returns Array of field type definitions for Bootstrap components
  */
 export function withBootstrapFields(config?: BootstrapConfig): FieldTypeDefinitionsWithConfig {
-  const fields = BOOTSTRAP_FIELD_TYPES as FieldTypeDefinitionsWithConfig;
+  if (!config) {
+    return BOOTSTRAP_FIELD_TYPES;
+  }
 
-  if (config) {
-    fields.__configProviders = [
-      {
-        provide: BOOTSTRAP_CONFIG,
-        useValue: config,
-      },
-    ];
+  const fields: FieldTypeDefinitionsWithConfig = [...BOOTSTRAP_FIELD_TYPES];
+  const firstField = fields[0];
+
+  if (firstField) {
+    const clonedField = { ...firstField };
+
+    Object.defineProperty(clonedField, '__configProviders', {
+      value: [
+        {
+          provide: BOOTSTRAP_CONFIG,
+          useValue: config,
+        },
+      ],
+      enumerable: false,
+    });
+
+    fields[0] = clonedField;
   }
 
   return fields;

@@ -2,7 +2,6 @@
  * Exhaustive type tests for MatButton field types.
  */
 import { expectTypeOf } from 'vitest';
-import type { StateLogicConfig } from '@ng-forge/dynamic-forms';
 import type { RequiredKeys } from '@ng-forge/utils';
 
 // Import registry augmentation to include Material field types in ArrayAllowedChildren

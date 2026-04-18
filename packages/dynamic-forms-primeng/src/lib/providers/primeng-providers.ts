@@ -5,11 +5,16 @@ import { PrimeNGConfig } from '../models/primeng-config';
 import { PRIMENG_CONFIG } from '../models/primeng-config.token';
 
 /**
- * Field type definitions with optional config providers
+ * Field type definition with optional config providers.
  */
-export type FieldTypeDefinitionsWithConfig = FieldTypeDefinition[] & {
+type FieldTypeDefinitionWithConfig = FieldTypeDefinition & {
   __configProviders?: Provider[];
 };
+
+/**
+ * Field type definitions whose individual items may carry config providers.
+ */
+export type FieldTypeDefinitionsWithConfig = FieldTypeDefinitionWithConfig[];
 
 /**
  * Provides PrimeNG field type definitions for the dynamic form system.
@@ -50,15 +55,27 @@ export type FieldTypeDefinitionsWithConfig = FieldTypeDefinition[] & {
  * @returns Array of field type definitions for PrimeNG components
  */
 export function withPrimeNGFields(config?: PrimeNGConfig): FieldTypeDefinitionsWithConfig {
-  const fields = PRIMENG_FIELD_TYPES as FieldTypeDefinitionsWithConfig;
+  if (!config) {
+    return PRIMENG_FIELD_TYPES;
+  }
 
-  if (config) {
-    fields.__configProviders = [
-      {
-        provide: PRIMENG_CONFIG,
-        useValue: config,
-      },
-    ];
+  const fields: FieldTypeDefinitionsWithConfig = [...PRIMENG_FIELD_TYPES];
+  const firstField = fields[0];
+
+  if (firstField) {
+    const clonedField = { ...firstField };
+
+    Object.defineProperty(clonedField, '__configProviders', {
+      value: [
+        {
+          provide: PRIMENG_CONFIG,
+          useValue: config,
+        },
+      ],
+      enumerable: false,
+    });
+
+    fields[0] = clonedField;
   }
 
   return fields;
