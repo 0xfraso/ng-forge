@@ -11,7 +11,13 @@ describe('withIonicFields', () => {
     TestBed.resetTestingModule();
   });
 
-  it('preserves config metadata on a cloned field when config is provided', () => {
+  it('returns original field types when no config provided', () => {
+    const fields = withIonicFields();
+
+    expect(fields).toBe(IONIC_FIELD_TYPES);
+  });
+
+  it('adds ionic-config feature when config is provided', () => {
     const config = {
       fill: 'outline',
       labelPlacement: 'floating',
@@ -19,15 +25,13 @@ describe('withIonicFields', () => {
     } satisfies IonicConfig;
 
     const fields = withIonicFields(config);
+    const feature = fields.find((f) => 'ɵkind' in f && f.ɵkind === 'ionic-config');
 
-    expect(fields).not.toBe(IONIC_FIELD_TYPES);
-    expect(fields[0]).not.toBe(IONIC_FIELD_TYPES[0]);
-    expect(fields[0]?.__configProviders).toEqual([
-      {
-        provide: IONIC_CONFIG,
-        useValue: config,
-      },
-    ]);
+    expect(feature).toBeDefined();
+    expect(feature.ɵproviders).toContainEqual({
+      provide: IONIC_CONFIG,
+      useValue: config,
+    });
   });
 
   it('registers IONIC_CONFIG when spread into provideDynamicForm', () => {

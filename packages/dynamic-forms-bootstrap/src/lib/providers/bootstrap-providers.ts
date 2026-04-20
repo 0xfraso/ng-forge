@@ -1,20 +1,20 @@
-import { FieldTypeDefinition } from '@ng-forge/dynamic-forms';
 import type { Provider } from '@angular/core';
+import type { FieldTypeDefinition } from '@ng-forge/dynamic-forms';
 import { BOOTSTRAP_FIELD_TYPES } from '../config/bootstrap-field-config';
 import { BootstrapConfig } from '../models/bootstrap-config';
 import { BOOTSTRAP_CONFIG } from '../models/bootstrap-config.token';
 
 /**
- * Field type definition with optional config providers.
+ * Field type definitions for Bootstrap components.
  */
-type FieldTypeDefinitionWithConfig = FieldTypeDefinition & {
-  __configProviders?: Provider[];
+export type BootstrapFieldTypes = FieldTypeDefinition[];
+
+type BootstrapConfigFeature = {
+  ɵkind: 'bootstrap-config';
+  ɵproviders: Provider[];
 };
 
-/**
- * Field type definitions whose individual items may carry config providers.
- */
-export type FieldTypeDefinitionsWithConfig = FieldTypeDefinitionWithConfig[];
+type BootstrapFieldsWithConfig = [...BootstrapFieldTypes, BootstrapConfigFeature];
 
 /**
  * Provides Bootstrap field types for the dynamic form system.
@@ -51,31 +51,24 @@ export type FieldTypeDefinitionsWithConfig = FieldTypeDefinitionWithConfig[];
  * };
  * ```
  *
- * @returns Array of field type definitions for Bootstrap components
+ * @returns Array of field type definitions and optionally a config feature
  */
-export function withBootstrapFields(config?: BootstrapConfig): FieldTypeDefinitionsWithConfig {
+export function withBootstrapFields(): BootstrapFieldTypes;
+export function withBootstrapFields(config: BootstrapConfig): BootstrapFieldsWithConfig;
+export function withBootstrapFields(config: BootstrapConfig | undefined): BootstrapFieldTypes | BootstrapFieldsWithConfig;
+export function withBootstrapFields(config?: BootstrapConfig): BootstrapFieldTypes | BootstrapFieldsWithConfig {
   if (!config) {
     return BOOTSTRAP_FIELD_TYPES;
   }
 
-  const fields: FieldTypeDefinitionsWithConfig = [...BOOTSTRAP_FIELD_TYPES];
-  const firstField = fields[0];
+  const fieldsWithConfig = [
+    ...BOOTSTRAP_FIELD_TYPES,
+    {
+      ɵkind: 'bootstrap-config',
+      ɵproviders: [{ provide: BOOTSTRAP_CONFIG, useValue: config }],
+    } satisfies BootstrapConfigFeature,
+  ];
 
-  if (firstField) {
-    const clonedField = { ...firstField };
-
-    Object.defineProperty(clonedField, '__configProviders', {
-      value: [
-        {
-          provide: BOOTSTRAP_CONFIG,
-          useValue: config,
-        },
-      ],
-      enumerable: false,
-    });
-
-    fields[0] = clonedField;
-  }
-
-  return fields;
+  // Safe: this preserves all bootstrap field definitions and appends exactly one config feature.
+  return fieldsWithConfig as BootstrapFieldsWithConfig;
 }

@@ -1,20 +1,20 @@
-import type { FieldTypeDefinition } from '@ng-forge/dynamic-forms';
 import type { Provider } from '@angular/core';
+import type { FieldTypeDefinition } from '@ng-forge/dynamic-forms';
 import { IONIC_FIELD_TYPES } from '../config/ionic-field-config';
 import { IonicConfig } from '../models/ionic-config';
 import { IONIC_CONFIG } from '../models/ionic-config.token';
 
 /**
- * Field type definition with optional config providers.
+ * Field type definitions for Ionic components.
  */
-type FieldTypeDefinitionWithConfig = FieldTypeDefinition & {
-  __configProviders?: Provider[];
+export type IonicFieldTypes = FieldTypeDefinition[];
+
+type IonicConfigFeature = {
+  ɵkind: 'ionic-config';
+  ɵproviders: Provider[];
 };
 
-/**
- * Field type definitions whose individual items may carry config providers.
- */
-export type FieldTypeDefinitionsWithConfig = FieldTypeDefinitionWithConfig[];
+type IonicFieldsWithConfig = [...IonicFieldTypes, IonicConfigFeature];
 
 /**
  * Configure dynamic forms with Ionic field types.
@@ -51,31 +51,24 @@ export type FieldTypeDefinitionsWithConfig = FieldTypeDefinitionWithConfig[];
  * };
  * ```
  *
- * @returns Array of field type definitions for Ionic components
+ * @returns Array of field type definitions and optionally a config feature
  */
-export function withIonicFields(config?: IonicConfig): FieldTypeDefinitionsWithConfig {
+export function withIonicFields(): IonicFieldTypes;
+export function withIonicFields(config: IonicConfig): IonicFieldsWithConfig;
+export function withIonicFields(config: IonicConfig | undefined): IonicFieldTypes | IonicFieldsWithConfig;
+export function withIonicFields(config?: IonicConfig): IonicFieldTypes | IonicFieldsWithConfig {
   if (!config) {
     return IONIC_FIELD_TYPES;
   }
 
-  const fields: FieldTypeDefinitionsWithConfig = [...IONIC_FIELD_TYPES];
-  const firstField = fields[0];
+  const fieldsWithConfig = [
+    ...IONIC_FIELD_TYPES,
+    {
+      ɵkind: 'ionic-config',
+      ɵproviders: [{ provide: IONIC_CONFIG, useValue: config }],
+    } satisfies IonicConfigFeature,
+  ];
 
-  if (firstField) {
-    const clonedField = { ...firstField };
-
-    Object.defineProperty(clonedField, '__configProviders', {
-      value: [
-        {
-          provide: IONIC_CONFIG,
-          useValue: config,
-        },
-      ],
-      enumerable: false,
-    });
-
-    fields[0] = clonedField;
-  }
-
-  return fields;
+  // Safe: this preserves all Ionic field definitions and appends exactly one config feature.
+  return fieldsWithConfig as IonicFieldsWithConfig;
 }

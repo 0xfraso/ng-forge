@@ -1,20 +1,20 @@
-import type { FieldTypeDefinition } from '@ng-forge/dynamic-forms';
 import type { Provider } from '@angular/core';
+import type { FieldTypeDefinition } from '@ng-forge/dynamic-forms';
 import { MATERIAL_FIELD_TYPES } from '../config/material-field-config';
 import { MaterialConfig } from '../models/material-config';
 import { MATERIAL_CONFIG } from '../models/material-config.token';
 
 /**
- * Field type definition with optional config providers.
+ * Field type definitions for Material Design components.
  */
-type FieldTypeDefinitionWithConfig = FieldTypeDefinition & {
-  __configProviders?: Provider[];
+export type MaterialFieldTypes = FieldTypeDefinition[];
+
+type MaterialConfigFeature = {
+  ɵkind: 'material-config';
+  ɵproviders: Provider[];
 };
 
-/**
- * Field type definitions whose individual items may carry config providers.
- */
-export type FieldTypeDefinitionsWithConfig = FieldTypeDefinitionWithConfig[];
+type MaterialFieldsWithConfig = [...MaterialFieldTypes, MaterialConfigFeature];
 
 /**
  * Configure dynamic forms with Material Design field types.
@@ -51,31 +51,24 @@ export type FieldTypeDefinitionsWithConfig = FieldTypeDefinitionWithConfig[];
  * };
  * ```
  *
- * @returns Array of field type definitions for Material Design components
+ * @returns Array of field type definitions and optionally a config feature
  */
-export function withMaterialFields(config?: MaterialConfig): FieldTypeDefinitionsWithConfig {
+export function withMaterialFields(): MaterialFieldTypes;
+export function withMaterialFields(config: MaterialConfig): MaterialFieldsWithConfig;
+export function withMaterialFields(config: MaterialConfig | undefined): MaterialFieldTypes | MaterialFieldsWithConfig;
+export function withMaterialFields(config?: MaterialConfig): MaterialFieldTypes | MaterialFieldsWithConfig {
   if (!config) {
     return MATERIAL_FIELD_TYPES;
   }
 
-  const fields: FieldTypeDefinitionsWithConfig = [...MATERIAL_FIELD_TYPES];
-  const firstField = fields[0];
+  const fieldsWithConfig = [
+    ...MATERIAL_FIELD_TYPES,
+    {
+      ɵkind: 'material-config',
+      ɵproviders: [{ provide: MATERIAL_CONFIG, useValue: config }],
+    } satisfies MaterialConfigFeature,
+  ];
 
-  if (firstField) {
-    const clonedField = { ...firstField };
-
-    Object.defineProperty(clonedField, '__configProviders', {
-      value: [
-        {
-          provide: MATERIAL_CONFIG,
-          useValue: config,
-        },
-      ],
-      enumerable: false,
-    });
-
-    fields[0] = clonedField;
-  }
-
-  return fields;
+  // Safe: this preserves all material field definitions and appends exactly one config feature.
+  return fieldsWithConfig as MaterialFieldsWithConfig;
 }

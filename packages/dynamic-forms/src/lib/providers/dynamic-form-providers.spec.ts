@@ -327,22 +327,21 @@ describe('provideDynamicForm', () => {
       expect(registry.has('custom')).toBe(true);
     });
 
-    it('should register config providers attached to field definitions', () => {
+    it('should register config providers via features', () => {
       const TEST_CONFIG = new InjectionToken<string>('TEST_CONFIG');
-      const customField: FieldTypeDefinition & { __configProviders?: Provider[] } = {
+      const customField: FieldTypeDefinition = {
         name: 'custom-config',
         loadComponent: () => import('../fields/text/text-field.component'),
         mapper: vi.fn(),
         valueHandling: 'exclude',
-        __configProviders: [
-          {
-            provide: TEST_CONFIG,
-            useValue: 'configured',
-          },
-        ],
       };
 
-      const envProviders = provideDynamicForm(customField);
+      const feature = {
+        ɵkind: 'custom-config',
+        ɵproviders: [{ provide: TEST_CONFIG, useValue: 'configured' }],
+      };
+
+      const envProviders = provideDynamicForm(customField, feature);
       TestBed.configureTestingModule({ providers: [envProviders] });
 
       expect(TestBed.inject(TEST_CONFIG)).toBe('configured');

@@ -11,7 +11,13 @@ describe('withPrimeNGFields', () => {
     TestBed.resetTestingModule();
   });
 
-  it('preserves config metadata on a cloned field when config is provided', () => {
+  it('returns original field types when no config provided', () => {
+    const fields = withPrimeNGFields();
+
+    expect(fields).toBe(PRIMENG_FIELD_TYPES);
+  });
+
+  it('adds primeng-config feature when config is provided', () => {
     const config = {
       size: 'large',
       variant: 'filled',
@@ -19,15 +25,13 @@ describe('withPrimeNGFields', () => {
     } satisfies PrimeNGConfig;
 
     const fields = withPrimeNGFields(config);
+    const feature = fields.find((f) => 'ɵkind' in f && f.ɵkind === 'primeng-config');
 
-    expect(fields).not.toBe(PRIMENG_FIELD_TYPES);
-    expect(fields[0]).not.toBe(PRIMENG_FIELD_TYPES[0]);
-    expect(fields[0]?.__configProviders).toEqual([
-      {
-        provide: PRIMENG_CONFIG,
-        useValue: config,
-      },
-    ]);
+    expect(feature).toBeDefined();
+    expect(feature.ɵproviders).toContainEqual({
+      provide: PRIMENG_CONFIG,
+      useValue: config,
+    });
   });
 
   it('registers PRIMENG_CONFIG when spread into provideDynamicForm', () => {

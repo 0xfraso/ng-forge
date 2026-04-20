@@ -11,7 +11,13 @@ describe('withBootstrapFields', () => {
     TestBed.resetTestingModule();
   });
 
-  it('preserves config metadata on a cloned field when config is provided', () => {
+  it('returns original field types when no config provided', () => {
+    const fields = withBootstrapFields();
+
+    expect(fields).toBe(BOOTSTRAP_FIELD_TYPES);
+  });
+
+  it('adds bootstrap-config feature when config is provided', () => {
     const config = {
       floatingLabel: true,
       size: 'lg',
@@ -19,15 +25,13 @@ describe('withBootstrapFields', () => {
     } satisfies BootstrapConfig;
 
     const fields = withBootstrapFields(config);
+    const feature = fields.find((f) => 'ɵkind' in f && f.ɵkind === 'bootstrap-config');
 
-    expect(fields).not.toBe(BOOTSTRAP_FIELD_TYPES);
-    expect(fields[0]).not.toBe(BOOTSTRAP_FIELD_TYPES[0]);
-    expect(fields[0]?.__configProviders).toEqual([
-      {
-        provide: BOOTSTRAP_CONFIG,
-        useValue: config,
-      },
-    ]);
+    expect(feature).toBeDefined();
+    expect(feature.ɵproviders).toContainEqual({
+      provide: BOOTSTRAP_CONFIG,
+      useValue: config,
+    });
   });
 
   it('registers BOOTSTRAP_CONFIG when spread into provideDynamicForm', () => {
