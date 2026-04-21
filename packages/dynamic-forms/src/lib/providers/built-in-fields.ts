@@ -4,12 +4,16 @@ import { groupFieldMapper } from '../mappers/group/group-field-mapper';
 import { rowFieldMapper } from '../mappers/row/row-field-mapper';
 import { pageFieldMapper } from '../mappers/page/page-field-mapper';
 import { textFieldMapper } from '../mappers/text/text-field-mapper';
+import { containerFieldMapper } from '../mappers/container/container-field-mapper';
 import { RowField } from '../definitions/default/row-field';
 import { GroupField } from '../definitions/default/group-field';
 import { HiddenField } from '../definitions/default/hidden-field';
 import { ArrayField } from '../definitions/default/array-field';
 import { PageField } from '../definitions/default/page-field';
 import { TextField } from '../definitions/default/text-field';
+import { ContainerField } from '../definitions/default/container-field';
+import { WrapperTypeDefinition } from '../models';
+import { CssWrapper, RowWrapper } from '../definitions/default';
 
 /**
  * Built-in field types provided by the dynamic form library.
@@ -61,7 +65,10 @@ const DISPLAY_FIELD_TYPES_BASE = {
 export const BUILT_IN_FIELDS: FieldTypeDefinition[] = [
   {
     name: 'row',
-    loadComponent: () => import('../fields/row/row-field.component'),
+    // `row` is a virtual field type: it maps to ContainerFieldComponent, and
+    // the rowFieldMapper injects a `{ type: 'row' }` wrapper so the container
+    // renders the flex/grid layout via RowWrapperComponent.
+    loadComponent: () => import('../fields/container/container-field.component'),
     mapper: rowFieldMapper,
     valueHandling: 'flatten',
   } satisfies FieldTypeDefinition<RowField>,
@@ -95,4 +102,21 @@ export const BUILT_IN_FIELDS: FieldTypeDefinition[] = [
     // Componentless field - no loadComponent or mapper needed
     valueHandling: 'include',
   } satisfies FieldTypeDefinition<HiddenField>,
+  {
+    name: 'container',
+    loadComponent: () => import('../fields/container/container-field.component'),
+    mapper: containerFieldMapper,
+    valueHandling: 'flatten',
+  } satisfies FieldTypeDefinition<ContainerField>,
+];
+
+export const BUILT_IN_WRAPPERS: WrapperTypeDefinition[] = [
+  {
+    wrapperName: 'css',
+    loadComponent: () => import('../wrappers/css/css-wrapper.component'),
+  } satisfies WrapperTypeDefinition<CssWrapper>,
+  {
+    wrapperName: 'row',
+    loadComponent: () => import('../wrappers/row/row-wrapper.component'),
+  } satisfies WrapperTypeDefinition<RowWrapper>,
 ];

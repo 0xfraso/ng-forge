@@ -2,12 +2,14 @@ import { EnvironmentProviders, inject, makeEnvironmentProviders, Provider } from
 import { provideSignalFormsConfig } from '@angular/forms/signals';
 import { NG_STATUS_CLASSES } from '@angular/forms/signals/compat';
 import { FIELD_REGISTRY, FieldTypeDefinition } from '../models/field-type';
-import { BUILT_IN_FIELDS } from './built-in-fields';
+import { BUILT_IN_FIELDS, BUILT_IN_WRAPPERS } from './built-in-fields';
 import { FieldDef } from '../definitions/base/field-def';
 import { DynamicFormFeature, isDynamicFormFeature } from './features/dynamic-form-feature';
 import { DynamicFormLogger } from './features/logger/logger.token';
 import { ConsoleLogger } from './features/logger/console-logger';
 import type { InferFormValue as RealInferFormValue } from '../models/types/form-value-inference';
+import { isWrapperTypeDefinition, WrapperTypeDefinition, WRAPPER_AUTO_ASSOCIATIONS, WRAPPER_REGISTRY, WrapperConfig } from '../models';
+import { isWrappersBundle, WrappersBundle } from '../wrappers/create-wrappers';
 
 // Re-export global types for module augmentation
 export type { DynamicFormFieldRegistry, AvailableFieldTypes } from '../models/registry';
@@ -39,7 +41,7 @@ type ProvideDynamicFormResult<T extends FieldTypeDefinition[]> = EnvironmentProv
 /**
  * Union type for items that can be passed to provideDynamicForm
  */
-type FieldTypeOrFeature = FieldTypeDefinition | DynamicFormFeature;
+type FieldTypeOrFeature = FieldTypeDefinition | WrapperTypeDefinition | WrappersBundle | DynamicFormFeature;
 
 /**
  * Extract only FieldTypeDefinition items from a tuple type
@@ -103,11 +105,16 @@ type ExtractFieldTypes<T extends FieldTypeOrFeature[]> = {
 export function provideDynamicForm<const T extends FieldTypeOrFeature[]>(
   ...items: T
 ): ProvideDynamicFormResult<ExtractFieldTypes<T> extends FieldTypeDefinition[] ? ExtractFieldTypes<T> : FieldTypeDefinition[]> {
-  // Separate field types from features
-  const fieldTypes = items.filter((item): item is FieldTypeDefinition => !isDynamicFormFeature(item));
+  // Separate field types, wrapper types, wrapper bundles, and features
+  const fieldTypes = items.filter(
+    (item): item is FieldTypeDefinition => !isDynamicFormFeature(item) && !isWrapperTypeDefinition(item) && !isWrappersBundle(item),
+  );
+  const wrapperTypes = items.filter(isWrapperTypeDefinition);
+  const wrapperBundles = items.filter(isWrappersBundle);
   const features = items.filter(isDynamicFormFeature);
 
   const fields = [...BUILT_IN_FIELDS, ...fieldTypes];
+  const wrappers = [...BUILT_IN_WRAPPERS, ...wrapperTypes, ...wrapperBundles.flatMap((bundle) => bundle.ɵdefinitions)];
 
   // Extract providers from features (includes config features like material-config, bootstrap-config, etc.)
   const featureProviders: Provider[] = [];
@@ -136,6 +143,40 @@ export function provideDynamicForm<const T extends FieldTypeOrFeature[]>(
           registry.set(fieldType.name, fieldType);
         });
         return registry;
+      },
+    },
+    // Always provide default Wrapper classes
+    {
+      provide: WRAPPER_REGISTRY,
+      useFactory: () => {
+        const logger = inject(DynamicFormLogger);
+        const registry = new Map();
+        // Add custom wrapper types
+        wrappers.forEach((wrapperType) => {
+          if (registry.has(wrapperType.wrapperName)) {
+            logger.warn(`Wrapper type "${wrapperType.wrapperName}" is already registered. Overwriting.`);
+          }
+          registry.set(wrapperType.wrapperName, wrapperType);
+        });
+        return registry;
+      },
+    },
+    // Pre-computed reverse index for auto-association lookup — built once so
+    // resolveWrappers is O(1) per field render instead of scanning every
+    // registered wrapper.
+    {
+      provide: WRAPPER_AUTO_ASSOCIATIONS,
+      useFactory: () => {
+        const autoMap = new Map<string, WrapperConfig[]>();
+        for (const wrapperType of wrappers) {
+          if (!wrapperType.types) continue;
+          for (const fieldType of wrapperType.types) {
+            const existing = autoMap.get(fieldType) ?? [];
+            existing.push({ type: wrapperType.wrapperName } as WrapperConfig);
+            autoMap.set(fieldType, existing);
+          }
+        }
+        return autoMap;
       },
     },
     ...featureProviders,

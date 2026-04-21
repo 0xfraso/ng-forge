@@ -199,9 +199,9 @@ $mobile-bp: 1024px;
   letter-spacing: 0.05em;
   line-height: 16px;
   border-radius: 4px;
-  background: rgba($ember-glow, 0.15);
-  color: $ember-glow;
-  margin-left: auto;
+  background: rgba(34, 197, 94, 0.18);
+  color: #22c55e;
+  margin-left: 8px;
 }
 
 // ============================================
@@ -266,6 +266,7 @@ $mobile-bp: 1024px;
 .sidebar-nav {
   display: flex;
   flex-direction: column;
+  margin-bottom: 24px;
 }
 
 // Bullet dot
@@ -397,7 +398,7 @@ $mobile-bp: 1024px;
 // ============================================
 .sidebar-footer {
   margin-top: auto;
-  padding: 16px 16px 24px;
+  padding: 16px;
   border-top: 1px solid var(--forge-border-color);
   flex-direction: column;
   gap: 4px;

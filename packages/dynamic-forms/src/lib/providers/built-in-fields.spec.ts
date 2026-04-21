@@ -18,8 +18,16 @@ describe('BUILT_IN_FIELDS', () => {
       expect(Array.isArray(BUILT_IN_FIELDS)).toBe(true);
     });
 
-    it('should contain 6 field type definitions', () => {
-      expect(BUILT_IN_FIELDS).toHaveLength(6);
+    it('should contain 7 field type definitions', () => {
+      expect(BUILT_IN_FIELDS).toHaveLength(7);
+    });
+
+    it('row field should map to the container component (virtual field type)', async () => {
+      const rowField = BUILT_IN_FIELDS.find((f) => f.name === 'row') as FieldTypeDefinition;
+      const containerField = BUILT_IN_FIELDS.find((f) => f.name === 'container') as FieldTypeDefinition;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- both have loadComponent
+      const [rowModule, containerModule] = await Promise.all([rowField.loadComponent!(), containerField.loadComponent!()]);
+      expect(rowModule.default).toBe(containerModule.default);
     });
 
     it('should have all required field types', () => {
@@ -31,6 +39,7 @@ describe('BUILT_IN_FIELDS', () => {
       expect(fieldNames).toContain('page');
       expect(fieldNames).toContain('text');
       expect(fieldNames).toContain('hidden');
+      expect(fieldNames).toContain('container');
     });
 
     it('should have unique field names', () => {
@@ -81,7 +90,7 @@ describe('BUILT_IN_FIELDS', () => {
   describe('Individual field configurations', () => {
     // Fields with components
     const fieldsWithComponents = [
-      { name: 'row', mapper: rowFieldMapper, valueHandling: 'flatten', exportName: 'RowFieldComponent' },
+      { name: 'row', mapper: rowFieldMapper, valueHandling: 'flatten', exportName: 'default' },
       { name: 'group', mapper: groupFieldMapper, valueHandling: 'include', exportName: 'GroupFieldComponent' },
       { name: 'array', mapper: arrayFieldMapper, valueHandling: 'include', exportName: 'ArrayFieldComponent' },
       { name: 'page', mapper: pageFieldMapper, valueHandling: 'flatten', exportName: 'default' },
@@ -131,7 +140,7 @@ describe('BUILT_IN_FIELDS', () => {
       const loadPromises = fieldsWithComponents.map((field) => field.loadComponent!());
       const modules = await Promise.all(loadPromises);
 
-      expect(modules).toHaveLength(5);
+      expect(modules).toHaveLength(6);
       modules.forEach((module) => {
         expect(module).toBeDefined();
       });

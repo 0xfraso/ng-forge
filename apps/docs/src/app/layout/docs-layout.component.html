@@ -53,6 +53,9 @@
           <div class="nav-category" [class.expanded]="isCategoryExpanded(item)" [class.url-active]="isActiveCategory(item)">
             <button class="nav-category-btn" (click)="toggleCategory(item.path)" [attr.aria-expanded]="isCategoryExpanded(item)">
               <span>{{ item.label }}</span>
+              @if (item.badge) {
+                <span class="nav-badge">{{ item.badge }}</span>
+              }
               <svg
                 class="chevron"
                 viewBox="0 0 24 24"
@@ -159,6 +162,10 @@
         <span class="theme-icon" [class]="'theme-icon--' + themeService.theme()"></span>
         <span>Theme: {{ themeService.theme() }}</span>
       </button>
+      <a href="https://discord.gg/qpzzvFagj3" class="sidebar-footer-btn" target="_blank" rel="noopener">
+        <span class="icon icon--discord"></span>
+        <span>Discord</span>
+      </a>
       <a href="https://github.com/ng-forge/ng-forge" class="sidebar-footer-btn" target="_blank" rel="noopener">
         <span class="icon icon--github"></span>
         <span>GitHub</span>

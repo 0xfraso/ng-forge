@@ -11,7 +11,7 @@ import {
   Signal,
   signal,
 } from '@angular/core';
-import { NgComponentOutlet } from '@angular/common';
+import { DfFieldOutlet } from '../../directives/df-field-outlet.directive';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, firstValueFrom, forkJoin, map, Observable, of } from 'rxjs';
 import { explicitEffect } from 'ngxtension/explicit-effect';
@@ -48,7 +48,7 @@ import { getNormalizedArrayMetadata } from '../../utils/array-field/normalized-a
  */
 @Component({
   selector: 'array-field',
-  imports: [NgComponentOutlet],
+  imports: [DfFieldOutlet],
   template: `
     @for (item of resolvedItems(); track item.id; let i = $index) {
       <div
@@ -59,16 +59,7 @@ import { getNormalizedArrayMetadata } from '../../utils/array-field/normalized-a
         [attr.data-array-item-index]="i"
       >
         @for (field of item.fields; track $index) {
-          @if (field.renderReady()) {
-            <ng-container
-              *ngComponentOutlet="
-                field.component;
-                injector: field.injector;
-                environmentInjector: environmentInjector;
-                inputs: field.inputs()
-              "
-            />
-          }
+          <ng-container *dfFieldOutlet="field; environmentInjector: environmentInjector" />
         }
       </div>
     }
@@ -325,9 +316,13 @@ export default class ArrayFieldComponent<TModel extends Record<string, unknown> 
    * Supports both primitive (single FieldDef) and object (FieldDef[]) templates.
    */
   private async handleAddFromEvent(template: FieldDef<unknown> | readonly FieldDef<unknown>[], index?: number): Promise<void> {
-    // Normalize template to mutable array for consistent handling
+    // Normalize template to mutable array for consistent handling.
+    // A single FieldDef with valueHandling: 'flatten' (container, row) is an object item
+    // whose children should be flattened — NOT a primitive item. Only true leaf fields
+    // (input, checkbox, etc.) are primitive when passed as a single FieldDef.
     const templates: FieldDef<unknown>[] = Array.isArray(template) ? [...template] : [template];
-    const isPrimitiveItem = !Array.isArray(template);
+    const isSingleField = !Array.isArray(template);
+    const isPrimitiveItem = isSingleField && getFieldValueHandling(templates[0].type, this.rawFieldRegistry()) !== 'flatten';
 
     // Track primitive field key for full-API arrays that start empty.
     // Simplified arrays already have this info from normalization metadata.
@@ -361,14 +356,14 @@ export default class ArrayFieldComponent<TModel extends Record<string, unknown> 
       for (const templateField of templates) {
         const rawValue = getFieldDefaultValue(templateField, this.rawFieldRegistry());
         const valueHandling = getFieldValueHandling(templateField.type, this.rawFieldRegistry());
-        const isContainer = templateField.type === 'group' || templateField.type === 'row';
+        const isContainer = templateField.type === 'group' || templateField.type === 'row' || templateField.type === 'container';
 
         if (isContainer) {
           if (isGroupField(templateField)) {
             // Groups wrap their fields under the group key
             value = { ...(value as Record<string, unknown>), [templateField.key]: rawValue };
           } else {
-            // Rows flatten their fields directly
+            // Rows and containers flatten their fields directly
             value = { ...(value as Record<string, unknown>), ...(rawValue as Record<string, unknown>) };
           }
         } else if (valueHandling === 'include' && templateField.key) {
