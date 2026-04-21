@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { TestBed } from '@angular/core/testing';
-import { EnvironmentProviders, Provider } from '@angular/core';
+import { EnvironmentProviders, InjectionToken, Provider } from '@angular/core';
 import { provideDynamicForm } from './dynamic-form-providers';
 import { FIELD_REGISTRY, FieldTypeDefinition } from '../models/field-type';
 import { WrapperTypeDefinition, WRAPPER_REGISTRY } from '../models/wrapper-type';
@@ -334,6 +334,26 @@ describe('provideDynamicForm', () => {
       const registry = createRegistryWithInjection(envProviders);
 
       expect(registry.has('custom')).toBe(true);
+    });
+
+    it('should register config providers via features', () => {
+      const TEST_CONFIG = new InjectionToken<string>('TEST_CONFIG');
+      const customField: FieldTypeDefinition = {
+        name: 'custom-config',
+        loadComponent: () => import('../fields/text/text-field.component'),
+        mapper: vi.fn(),
+        valueHandling: 'exclude',
+      };
+
+      const feature = {
+        ɵkind: 'custom-config',
+        ɵproviders: [{ provide: TEST_CONFIG, useValue: 'configured' }],
+      };
+
+      const envProviders = provideDynamicForm(customField, feature);
+      TestBed.configureTestingModule({ providers: [envProviders] });
+
+      expect(TestBed.inject(TEST_CONFIG)).toBe('configured');
     });
   });
 

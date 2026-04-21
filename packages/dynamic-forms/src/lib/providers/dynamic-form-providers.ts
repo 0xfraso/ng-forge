@@ -16,13 +16,6 @@ export type { DynamicFormFieldRegistry, AvailableFieldTypes } from '../models/re
 export type { RegisteredFieldTypes } from '../models/types';
 
 /**
- * Field type definitions with optional config providers
- */
-type FieldTypeDefinitionsWithConfig = FieldTypeDefinition[] & {
-  __configProviders?: Provider[];
-};
-
-/**
  * Extract FieldDef type from FieldTypeDefinition
  */
 type ExtractFieldDef<T> = T extends FieldTypeDefinition<infer F> ? F : never;
@@ -123,16 +116,7 @@ export function provideDynamicForm<const T extends FieldTypeOrFeature[]>(
   const fields = [...BUILT_IN_FIELDS, ...fieldTypes];
   const wrappers = [...BUILT_IN_WRAPPERS, ...wrapperTypes, ...wrapperBundles.flatMap((bundle) => bundle.ɵdefinitions)];
 
-  // Extract config providers from field type arrays
-  const configProviders: Provider[] = [];
-  fieldTypes.forEach((fieldTypeArray) => {
-    const fieldTypeWithConfig = fieldTypeArray as unknown as FieldTypeDefinitionsWithConfig;
-    if (fieldTypeWithConfig.__configProviders) {
-      configProviders.push(...fieldTypeWithConfig.__configProviders);
-    }
-  });
-
-  // Extract providers from features
+  // Extract providers from features (includes config features like material-config, bootstrap-config, etc.)
   const featureProviders: Provider[] = [];
   const hasLoggerFeature = features.some((feature) => feature.ɵkind === 'logger');
   features.forEach((feature) => {
@@ -195,7 +179,6 @@ export function provideDynamicForm<const T extends FieldTypeOrFeature[]>(
         return autoMap;
       },
     },
-    ...configProviders,
     ...featureProviders,
   ]) as ProvideDynamicFormResult<ExtractFieldTypes<T> extends FieldTypeDefinition[] ? ExtractFieldTypes<T> : FieldTypeDefinition[]>;
 }
