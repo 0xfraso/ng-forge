@@ -437,7 +437,7 @@ jobs:
               echo "@ng-forge/${pkg}@${VERSION} already published — skipping"
               continue
             fi
-            npm publish "dist/packages/$pkg" --access public --provenance --tag "$DIST_TAG"
+            npm publish "dist/packages/$pkg" --access public --provenance --tag "$DIST_TAG" --loglevel=verbose
           done
 
       - name: Configure Git
