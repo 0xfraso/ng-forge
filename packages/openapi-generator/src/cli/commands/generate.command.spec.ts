@@ -82,6 +82,42 @@ describe('registerGenerateOptions', () => {
     const readOnlyOption = program.options.find((opt) => opt.long === '--read-only');
     expect(readOnlyOption).toBeDefined();
   });
+
+  it('should register --barrel-extension option', () => {
+    const program = new Command();
+    registerGenerateOptions(program);
+
+    const barrelExtOption = program.options.find((opt) => opt.long === '--barrel-extension');
+    expect(barrelExtOption).toBeDefined();
+  });
+
+  it('should accept empty string and dot-prefixed values for --barrel-extension', () => {
+    for (const value of ['', '.js', '.mjs', '.cjs']) {
+      const program = new Command();
+      program.exitOverride();
+      registerGenerateOptions(program);
+      program.action(() => {
+        /* noop */
+      });
+
+      expect(() => {
+        program.parse(['--spec', 'a.yaml', '--output', './out', '--interactive', 'none', '--barrel-extension', value], { from: 'user' });
+      }).not.toThrow();
+    }
+  });
+
+  it('should reject non-dot-prefixed --barrel-extension values', () => {
+    const program = new Command();
+    program.exitOverride();
+    registerGenerateOptions(program);
+    program.action(() => {
+      /* noop */
+    });
+
+    expect(() => {
+      program.parse(['--spec', 'a.yaml', '--output', './out', '--interactive', 'none', '--barrel-extension', 'banana'], { from: 'user' });
+    }).toThrow(/Invalid --barrel-extension/);
+  });
 });
 
 describe('filterEndpoints', () => {

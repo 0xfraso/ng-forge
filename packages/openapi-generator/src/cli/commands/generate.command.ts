@@ -31,6 +31,7 @@ interface GenerateOptions {
   skipExisting?: boolean;
   verbose?: boolean;
   quiet?: boolean;
+  barrelExtension?: string;
 }
 
 /**
@@ -57,6 +58,16 @@ export function registerGenerateOptions(cmd: Command): void {
     .option('--config <path>', 'Directory for .ng-forge-generator.json config (defaults to --output)')
     .option('--dry-run', 'List files that would be generated without writing them')
     .option('--skip-existing', 'Skip files that already exist on disk')
+    .option(
+      '--barrel-extension <ext>',
+      'Extension used in barrel file exports. Accepts "" (default — no extension, for bundler/Angular setups) or a dot-prefixed extension like ".js" (for Node ESM / moduleResolution node16|nodenext). Pass "" to clear a previously-saved value',
+      (value: string) => {
+        if (value !== '' && !/^\.[a-z0-9]+$/i.test(value)) {
+          throw new Error(`Invalid --barrel-extension '${value}'. Expected "" or a dot-prefixed extension like ".js".`);
+        }
+        return value;
+      },
+    )
     .option('--verbose', 'Show detailed output including field mapping decisions')
     .option('--quiet', 'Suppress info output; still shows success summary, warnings, and errors')
     .addHelpText('after', '\nNote: Generated files are not formatted. Run your project formatter (e.g. prettier) after generation.');
@@ -86,6 +97,7 @@ async function runGenerate(options: GenerateOptions): Promise<void> {
   const configDir = options.config ?? options.output;
   const existingConfig = await loadConfig(configDir);
   const decisions = existingConfig?.decisions ?? {};
+  const barrelExtension = options.barrelExtension ?? existingConfig?.barrelExtension ?? '';
 
   if (existingConfig) {
     logger.info(`Loaded config from ${configDir}/.ng-forge-generator.json (${existingConfig.endpoints.length} saved endpoint(s))`);
@@ -257,12 +269,12 @@ async function runGenerate(options: GenerateOptions): Promise<void> {
 
   allFiles.push({
     fileName: 'index.ts',
-    content: generateBarrel(allFormFileNames),
+    content: generateBarrel(allFormFileNames, { extension: barrelExtension }),
     subdirectory: 'forms',
   });
   allFiles.push({
     fileName: 'index.ts',
-    content: generateBarrel(allInterfaceFileNames),
+    content: generateBarrel(allInterfaceFileNames, { extension: barrelExtension }),
     subdirectory: 'types',
   });
 
@@ -309,6 +321,10 @@ async function runGenerate(options: GenerateOptions): Promise<void> {
     endpoints: configEndpoints,
     decisions: updatedDecisions,
     readOnly: options.readOnly,
+    // Only persist when non-default so the empty (default) state is representable
+    // as "field absent" — letting users clear a previously-saved .js setting by
+    // passing --barrel-extension "" (or deleting the key manually).
+    ...(barrelExtension !== '' && { barrelExtension }),
   };
   await saveConfig(configDir, config);
 
