@@ -26,9 +26,8 @@ import { setupInitializationTracking } from './utils/initialization-tracker/init
 import { InferFormValue } from './models/types/form-value-inference';
 import { hasChildFields, isContainerField } from './models/types/type-guards';
 import { explicitEffect } from 'ngxtension/explicit-effect';
-import { DERIVATION_ORCHESTRATOR } from './core/derivation/derivation-orchestrator';
-import { PROPERTY_DERIVATION_ORCHESTRATOR } from './core/property-derivation/property-derivation-orchestrator';
 import { PageOrchestratorComponent } from './core/page-orchestrator/page-orchestrator.component';
+import { FORM_INITIALIZER } from './providers/form-initializer.token';
 import { FormClearEvent } from './events/constants/form-clear.event';
 import { FormResetEvent } from './events/constants/form-reset.event';
 import { PageChangeEvent } from './events/constants/page-change.event';
@@ -256,12 +255,13 @@ export class DynamicForm<
     this.dispatcher?.connect(this.eventBus);
     this.destroyRef.onDestroy(() => this.dispatcher?.disconnect());
 
-    // Inject orchestrators eagerly so derivation streams are set up before the first
-    // render cycle. Previously afterNextRender() deferred injection, causing
-    // (initialized) to fire before derivations ran. The circular dependency that
-    // originally motivated the deferral is resolved via dynamic-form-di.ts.
-    this.injector.get(DERIVATION_ORCHESTRATOR);
-    this.injector.get(PROPERTY_DERIVATION_ORCHESTRATOR);
+    // Wake feature-provider orchestrators (derivation, property-derivation, …) so their
+    // reactive streams are wired before first render. Each feature provider registers
+    // itself via FORM_INITIALIZER multi-provider; resolving the array forces DI to
+    // construct each entry. Without a feature provider, the array stays empty and no
+    // static reference to that feature's classes leaks into this component.
+    // Runs after dispatcher.connect() to preserve the prior bootstrap order.
+    inject(FORM_INITIALIZER, { optional: true });
 
     this.setupEffects();
     this.setupEventHandlers();
