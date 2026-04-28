@@ -516,7 +516,14 @@ export class SuperUIErrorsComponent {
 **`src/lib/config/superui-field-config.ts`:**
 
 ```typescript
-import { FieldTypeDefinition, valueFieldMapper, checkboxFieldMapper, buttonFieldMapper } from '@ng-forge/dynamic-forms';
+import {
+  FieldTypeDefinition,
+  valueFieldMapper,
+  optionsFieldMapper,
+  datepickerFieldMapper,
+  checkboxFieldMapper,
+  buttonFieldMapper,
+} from '@ng-forge/dynamic-forms';
 
 export const SUPERUI_FIELD_TYPES: FieldTypeDefinition[] = [
   // ========== Input Field ==========
@@ -531,7 +538,7 @@ export const SUPERUI_FIELD_TYPES: FieldTypeDefinition[] = [
   {
     name: 'select',
     loadComponent: () => import('../fields/select/superui-select.component'),
-    mapper: valueFieldMapper,
+    mapper: optionsFieldMapper,
     valueHandling: 'include',
   },
 
@@ -555,7 +562,7 @@ export const SUPERUI_FIELD_TYPES: FieldTypeDefinition[] = [
   {
     name: 'datepicker',
     loadComponent: () => import('../fields/datepicker/superui-datepicker.component'),
-    mapper: valueFieldMapper,
+    mapper: datepickerFieldMapper,
     valueHandling: 'include',
   },
 
@@ -579,7 +586,7 @@ export const SUPERUI_FIELD_TYPES: FieldTypeDefinition[] = [
   {
     name: 'radio',
     loadComponent: () => import('../fields/radio/superui-radio.component'),
-    mapper: valueFieldMapper,
+    mapper: optionsFieldMapper,
     valueHandling: 'include',
   },
 
@@ -595,7 +602,7 @@ export const SUPERUI_FIELD_TYPES: FieldTypeDefinition[] = [
   {
     name: 'multiCheckbox',
     loadComponent: () => import('../fields/multi-checkbox/superui-multi-checkbox.component'),
-    mapper: valueFieldMapper,
+    mapper: optionsFieldMapper,
     valueHandling: 'include',
   },
 ];
@@ -603,7 +610,9 @@ export const SUPERUI_FIELD_TYPES: FieldTypeDefinition[] = [
 
 **Mapper Selection:**
 
-- **`valueFieldMapper`**: For fields with form values (input, select, textarea, etc.)
+- **`valueFieldMapper`**: For fields with form values (input, textarea, slider, etc.)
+- **`optionsFieldMapper`**: For fields with multiple options (select, radio, multi-checkbox, etc.)
+- **`datepickerFieldMapper`**: For date input fields
 - **`checkboxFieldMapper`**: For boolean fields (checkbox, toggle)
 - **`buttonFieldMapper`**: For buttons (no form binding)
 - **Custom mapper**: When you need special binding logic
